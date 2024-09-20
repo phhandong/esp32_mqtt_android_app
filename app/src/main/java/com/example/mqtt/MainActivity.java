@@ -1,8 +1,10 @@
 package com.example.mqtt;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,9 +17,11 @@ import androidx.core.view.WindowInsetsCompat;
 public class MainActivity extends AppCompatActivity {
     private static final String BROKER_URL = "tcp://broker.hivemq.com:1883";
     private static final String Client_ID = "android-client_test_fdsadfawhd";
-    private MqttHandler mqttHandler;
+    public static MqttHandler mqttHandler;
     private TextView mqttMessageView;
     private Button sendButton;
+    private Switch SwitchMod;
+
     private EditText textToSend;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         mqttMessageView = findViewById(R.id.mqtt_message_view);
         textToSend = findViewById(R.id.text_to_send);
         sendButton = findViewById(R.id.send_button);
+        SwitchMod = findViewById(R.id.Mode_Switch);
+
         mqttHandler = new MqttHandler();
         mqttHandler.setMessageCallback((topic, message) -> {
             runOnUiThread(() -> mqttMessageView.setText("Topic: " + topic + "\nMessage: " + message));
@@ -41,9 +47,20 @@ public class MainActivity extends AppCompatActivity {
         SubscribeToTopic("testtopic/t2");
         SubscribeToTopic("testtopic/t3");
 //        publishMessage("testtopic/t1","asd");S
+
         sendButton.setOnClickListener(v -> {
             String message = textToSend.getText().toString();
             publishMessage("testtopic/t3",message);
+        });
+
+        SwitchMod.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                Intent intent = new Intent(MainActivity.this, msgActivity.class);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
